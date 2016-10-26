@@ -14,7 +14,7 @@ when 'debian', 'ubuntu'
     sqlite
     libsqlite3-dev
     make
-    ruby1.9.1-dev
+    ruby-dev
     g++
   ).each do |deb|
     package deb
@@ -50,12 +50,20 @@ when 'ubuntu'
     supports restart: true
     action :start
   end
-# sysv script for debian
+# sysv (or systemd for newer versions) script for debian
 when 'debian'
-  template '/etc/init.d/mailcatcher' do
-    source 'mailcatcher.init.debian.conf.erb'
-    mode 0744
-    notifies :start, 'service[mailcatcher]', :immediately
+  if node['platform_version'].to_f >= 8.0
+    template '/etc/systemd/system/mailcatcher.service' do
+      source 'mailcatcher.init.systemd.conf.erb'
+      mode 0644
+      notifies :start, 'service[mailcatcher]', :immediately
+    end
+  else
+    template '/etc/init.d/mailcatcher' do
+      source 'mailcatcher.init.debian.conf.erb'
+      mode 0744
+      notifies :start, 'service[mailcatcher]', :immediately
+    end
   end
   service 'mailcatcher' do
     provider Chef::Provider::Service::Init
