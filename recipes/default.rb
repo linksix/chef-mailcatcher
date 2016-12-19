@@ -58,17 +58,22 @@ when 'debian'
       mode 0644
       notifies :start, 'service[mailcatcher]', :immediately
     end
+    service 'mailcatcher' do
+      provider Chef::Provider::Service::Systemd
+      supports start: true, stop: true, status: true
+      action :start
+    end
   else
     template '/etc/init.d/mailcatcher' do
       source 'mailcatcher.init.debian.conf.erb'
       mode 0744
       notifies :start, 'service[mailcatcher]', :immediately
     end
-  end
-  service 'mailcatcher' do
-    provider Chef::Provider::Service::Init
-    supports start: true, stop: true, status: true
-    action :start
+    service 'mailcatcher' do
+      provider Chef::Provider::Service::Init
+      supports start: true, stop: true, status: true
+      action :start
+    end
   end
 # sysv script for centos and suse (needs to be tested on suse still)
 when 'centos'
