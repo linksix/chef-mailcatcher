@@ -63,6 +63,10 @@ when 'debian'
       supports start: true, stop: true, status: true
       action :start
     end
+    service 'mailcatcher' do
+      provider Chef::Provider::Service::Systemd
+      action :enable
+    end
   else
     template '/etc/init.d/mailcatcher' do
       source 'mailcatcher.init.debian.conf.erb'
