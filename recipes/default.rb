@@ -33,14 +33,17 @@ end
 
 # Install Ruby language if not exists in PATH
 package 'ruby' do
-  action :nothing
+  action :install
   not_if 'which ruby'
+end
+execute 'gem_system_update' do
+  command 'gem update --system -N;sleep 2;gem update -N'
+  not_if 'which mailcatcher'
 end
 
 # Install mailcatcher
 gem_package 'mailcatcher' do
   version node['mailcatcher']['version'] if node['mailcatcher']['version']
-  notifies :install, 'package[ruby]', :before
 end
 
 # Create init scripts for Mailcatcher daemon.
