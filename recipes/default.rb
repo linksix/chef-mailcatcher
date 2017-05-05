@@ -31,9 +31,16 @@ when 'rhel', 'fedora', 'suse'
   end
 end
 
+# Install Ruby language if not exists in PATH
+package 'ruby' do
+  action :nothing
+  not_if 'which ruby'
+end
+
 # Install mailcatcher
 gem_package 'mailcatcher' do
   version node['mailcatcher']['version'] if node['mailcatcher']['version']
+  notifies :install, 'package[ruby]', :before
 end
 
 # Create init scripts for Mailcatcher daemon.
